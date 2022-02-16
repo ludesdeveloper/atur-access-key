@@ -1,4 +1,4 @@
-# **Apus Access Key**
+# **Atur Access Key**
 App For Searching and Delete Access Key on AWS
 <p align="center">
 <img src="pic/ludes.png" width="500">
@@ -12,11 +12,11 @@ App For Searching and Delete Access Key on AWS
 ### **How To**
 1. Clone repository
 ```
-git clone https://github.com/ludesdeveloper/apus-access-key.git
+git clone https://github.com/ludesdeveloper/atur-access-key.git
 ```
 2. Change directory
 ```
-cd apus-access-key
+cd atur-access-key
 ```
 3. Install Python dependencies
 ```
