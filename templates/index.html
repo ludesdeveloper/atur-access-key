@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+
+<body>
+    <div id="app">
+        <v-app>
+            <v-main>
+                <template>
+                    <div>
+                        <v-data-table :headers="headers" :items="accessKeyInfo" item-key="AccessKeyId"
+                            class="elevation-1" :search="search" :custom-filter="filterOnlyCapsText">
+                            <template v-slot:top>
+                                <v-text-field v-model="search" label="Search (UPPER CASE ONLY)" class="mx-4">
+                                </v-text-field>
+                            </template>
+                            <template v-slot:item.delete="{ item }">
+                                <v-btn v-model="item.AccessKeyId"
+                                    @click="deleteAccessKey(accessKeyInfo.indexOf(item), item.UserName, item.AccessKeyId)">
+                                    Delete
+                                </v-btn>
+                            </template>
+                            <template v-slot:item.create="{ item }">
+                                <v-btn v-model="item.AccessKeyId" @click="createAccessKey(item.UserName)">
+                                    Create
+                                </v-btn>
+                            </template>
+                            <template v-slot:body.append>
+                            </template>
+                        </v-data-table>
+                    </div>
+                </template>
+                <template>
+                    <div class="text-center">
+                        <v-snackbar :timeout="timeout" v-model="snackbar" :vertical="vertical">
+                            <v-simple-table>
+                                <template v-slot:default>
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left">
+                                                Object
+                                            </th>
+                                            <th class="text-left">
+                                                Value
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Access Key Id</td>
+                                            <td>[[ snackbarMessage.AccessKeyId ]]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Create Date</td>
+                                            <td>[[ snackbarMessage.CreateDate ]]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Secret Access Key</td>
+                                            <td>[[ snackbarMessage.SecretAccessKey ]]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Status</td>
+                                            <td>[[ snackbarMessage.Status ]]</td>
+                                        </tr>
+                                        <tr>
+                                            <td>User Name</td>
+                                            <td>[[ snackbarMessage.UserName ]]</td>
+                                        </tr>
+                                    </tbody>
+                                </template>
+                            </v-simple-table>
+                            <template v-slot:action="{ attrs }">
+                                <v-btn color="indigo" text v-bind="attrs" @click="snackbar = false">
+                                    Close
+                                </v-btn>
+                            </template>
+                        </v-snackbar>
+                    </div>
+                </template>
+            </v-main>
+        </v-app>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.25.0/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            delimiters: ['[[', ']]'],
+            data: {
+                search: '',
+                accessKeyInfo: [
+                    {
+                        AccessKeyId: 'Loading Data',
+                        CreateDate: 'Loading Data',
+                        Status: 'Loading Data',
+                        UserName: 'Loading Data',
+                        Age: 'Loading Data',
+                    },
+                ],
+                snackbar: false,
+                vertical: true,
+                timeout: -1,
+                snackbarMessage: '',
+            },
+            computed: {
+                headers() {
+                    return [
+                        {
+                            text: 'Username',
+                            align: 'start',
+                            sortable: false,
+                            value: 'UserName',
+                        },
+                        { text: 'Access Key Id', value: 'AccessKeyId', },
+                        { text: 'Status', value: 'Status' },
+                        { text: 'CreateDate', value: 'CreateDate' },
+                        { text: 'Age(Days)', value: 'Age' },
+                        { text: 'Action', value: 'delete' },
+                        { text: 'Action', value: 'create' },
+                    ]
+                },
+                lenaccessKeyInfo() {
+                    return "test"
+                }
+            },
+            methods: {
+                filterOnlyCapsText(value, search, item) {
+                    return value != null &&
+                        search != null &&
+                        typeof value === 'string' &&
+                        value.toString().toLocaleUpperCase().indexOf(search) !== -1
+                },
+                deleteAccessKey(index, userName, accessKey) {
+                    this.accessKeyInfo.splice(index, 1)
+                    return axios
+                        .post('http://127.0.0.1:5000/accesskey', { userName: userName, accessKey: accessKey })
+                },
+                async createAccessKey(userName) {
+                    await axios
+                        .post('http://127.0.0.1:5000/createaccesskey', { userName: userName })
+                        .then(response => (this.snackbarMessage = response.data))
+                    await axios
+                        .get('http://127.0.0.1:5000/accesskey')
+                        .then(response => (this.accessKeyInfo = response.data))
+                    this.snackbar = true
+                    return this.snackbarMessage
+                }
+            },
+            mounted() {
+                axios
+                    .get('http://127.0.0.1:5000/accesskey')
+                    .then(response => (this.accessKeyInfo = response.data))
+            }
+        })
+    </script>
+</body>
+
+</html>
