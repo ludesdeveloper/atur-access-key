@@ -31,4 +31,4 @@ python main.py
 http://127.0.0.1:5000
 ```
 ### **Video**
-[![Atur Access Key](https://img.youtube.com/vi/T9Q7hmXhUt4/0.jpg)](https://www.youtube.com/watch?v=T9Q7hmXhUt4)
+[![Atur Access Key](pic/vid_thumbnail.png)](https://www.youtube.com/watch?v=T9Q7hmXhUt4)
